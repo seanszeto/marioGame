@@ -16,6 +16,8 @@ public class gameApp implements Runnable {
     //You can set their initial values too
 
     //Sets the width and height of the program window
+
+    public boolean gameOver = false;
     final int WIDTH = 1100;
     final int HEIGHT = 600;
 
@@ -32,12 +34,18 @@ public class gameApp implements Runnable {
     public Image firemarioPic;
     public Image smallmarioPic;
     public Image gameoverPic;
+    public Image billPic;
 
     //Declare the objects used in the program
     //These are things that are made up of more than one variable type
     public Mario marioFigure;
     public Mario mushroomFigure;
     public Mario goombaFigure;
+    public Mario billFigure;
+    public SoundFile thememusic;
+    public SoundFile powerdown;
+    public SoundFile powerup;
+    public SoundFile die;
 
     // Main method definition
     // This is the code that runs first and automatically
@@ -46,34 +54,51 @@ public class gameApp implements Runnable {
         new Thread(ex).start();                 //creates a threads & starts up the code in the run( ) method
     }
 
-public gameApp() {
-    setUpGraphics();
+    public gameApp() {
+        setUpGraphics();
 
-    marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
-    marioFigure = new Mario("mario", 10, 100);
-    marioFigure.lives = 2;
+        marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
+        marioFigure = new Mario("mario", 200, 300);
+        marioFigure.lives = 2;
 
-    mushroomPic = Toolkit.getDefaultToolkit().getImage("mushroom8bit.png");
-    mushroomFigure = new Mario("mushroom", 50, 480);
-    // mushroomFigure.dy = 0;
-    mushroomFigure.width = 40;
-    mushroomFigure.height = 40;
 
-    goombaPic = Toolkit.getDefaultToolkit().getImage("goomba8bit.png");
-    goombaFigure = new Mario ("goomba", 50, 480);
-    goombaFigure.dy = 0;
-    goombaFigure.width = 40;
-    goombaFigure.height = 40;
+        mushroomPic = Toolkit.getDefaultToolkit().getImage("mushroom8bit.png");
+        mushroomFigure = new Mario("mushroom", 50, 480);
+        // mushroomFigure.dy = 0;
+        mushroomFigure.width = 40;
+        mushroomFigure.height = 40;
 
-    smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
-    // smallmarioFigure = new smallMario()
+        goombaPic = Toolkit.getDefaultToolkit().getImage("goomba8bit.png");
+        goombaFigure = new Mario ("goomba", 50, 480);
+        goombaFigure.dy = 0;
+        goombaFigure.width = 40;
+        goombaFigure.height = 40;
 
-    firemarioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
+        billPic = Toolkit.getDefaultToolkit().getImage("bulletbill.png");
+        billFigure = new Mario ("bill", 500, 600);
+        billFigure.dy = 0;
+        billFigure.width = 30;
+        billFigure.height = 30;
 
-    gameoverPic = Toolkit.getDefaultToolkit().getImage("gameover.png");
+        smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
+        // smallmarioFigure = new smallMario()
 
-    backgroundPic = Toolkit.getDefaultToolkit().getImage("marioBackground.png");
-}
+        firemarioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
+
+        gameoverPic = Toolkit.getDefaultToolkit().getImage("gameover.png");
+
+        backgroundPic = Toolkit.getDefaultToolkit().getImage("marioBackground.png");
+
+        thememusic = new SoundFile("runningabout.wav");
+
+        powerup = new SoundFile("powerup.wav");
+
+        powerdown = new SoundFile("powerdown.wav");
+
+        die = new SoundFile("die.wav");
+
+        thememusic.play();
+    }
 
     public void run() {
 
@@ -92,44 +117,82 @@ public gameApp() {
         mushroomFigure.mushroomBounce();
         marioFigure.bounce();
         goombaFigure.bounce();
+        billFigure.wrap();
     }
 
     public void crash(){
-        if (mushroomFigure.rec.intersects(marioFigure.rec) && !marioFigure.isCrashing){
+        if (mushroomFigure.rec.intersects(marioFigure.rec) && marioFigure.isCrashing == false){
 
             marioFigure.isCrashing = true;
+            powerup.play();
+            // thememusic.pause();
+            if (marioFigure.lives == 1) {
+                marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
+            }
+            if (marioFigure.lives == 2) {
+                marioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
+            }
             // marioFigure.width = marioFigure.width*2;
             // marioFigure.height = marioFigure.height*2;
-            marioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
+            // marioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
             // mushroomFigure.bounce();
             // mushroomFigure.changeDirection();
             marioFigure.width = 100;
             marioFigure.height = 80;
-            marioFigure.lives = marioFigure.lives + 1;
-            System.out.println(marioFigure.lives);
+            if (marioFigure.lives < 3) {
+                marioFigure.lives = marioFigure.lives + 1;
+                System.out.println(marioFigure.lives);
+            }
+
         }
-        if (marioFigure.rec.intersects(mushroomFigure.rec)) {
+        // System.out.println(marioFigure.isCrashing);
+        if (!marioFigure.rec.intersects(mushroomFigure.rec)) {
             marioFigure.isCrashing = false;
+            // System.out.println("not touching mushroom");
         }
-
     }
-
-
     public void mimimizeMario(){
-        if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isCrashing == false){
-            marioFigure.isCrashing = true;
+        if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
+            marioFigure.isMinimizing = true;
+            // marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
+            // marioFigure.width = 30;
+            // marioFigure.height = 30;
+
+            powerdown.play();
+            // thememusic.pause();
+
+            if (marioFigure.lives <= 3){
+                marioFigure.lives = marioFigure.lives - 1;
+                System.out.println(marioFigure.lives);
+            }
+
+            if (marioFigure.lives == 1) {
+                marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
+                marioFigure.width = 30;
+                marioFigure.height = 30;
+            }
+            if (marioFigure.lives == 2) {
+                marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
+            }
+
+        }
+        if (billFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
+            marioFigure.isMinimizing = true;
             marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
             marioFigure.width = 30;
             marioFigure.height = 30;
-            marioFigure.lives = marioFigure.lives - 1;
-            System.out.println(marioFigure.lives);
+            if (marioFigure.lives <= 2) {
+                marioFigure.lives = marioFigure.lives - 1;
+                System.out.println(marioFigure.lives);
+            }
         }
-        if (marioFigure.rec.intersects(goombaFigure.rec)) {
-            marioFigure.isCrashing = false;
+        if (!marioFigure.rec.intersects(goombaFigure.rec)) {
+            marioFigure.isMinimizing = false;
         }
         if (marioFigure.lives == 0) {
-            backgroundPic = Toolkit.getDefaultToolkit().getImage("gameover.png");
-
+            gameOver = true;
+            die.play();
+            thememusic.stop();
         }
     }
 
@@ -177,20 +240,27 @@ public gameApp() {
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
-        g.drawImage(backgroundPic, 0, 0, WIDTH, HEIGHT, null);
+        if (gameOver == false) {
+            g.drawImage(backgroundPic, 0, 0, WIDTH, HEIGHT, null);
 
-        if (mushroomFigure.isAlive){
+            // if mushroomFigure.isAlive(){
             g.drawImage(mushroomPic, mushroomFigure.xpos, mushroomFigure.ypos, mushroomFigure.width, mushroomFigure.height, null);
             // g.drawRect(mushroomFigure.rec.x, mushroomFigure.rec.y, mushroomFigure.rec.width, mushroomFigure.rec.width);
+        // }
+            //draw the image of the astronaut
+
+            g.drawImage(marioPic, marioFigure.xpos, marioFigure.ypos, marioFigure.width, marioFigure.height, null);
+            // g.drawRect(marioFigure.rec.x, marioFigure.rec.y, marioFigure.rec.width,marioFigure.rec.height);
+
+            g.drawImage(goombaPic, goombaFigure.xpos, goombaFigure.ypos, goombaFigure.width, goombaFigure.height, null);
+            // g.drawRect(goombaFigure.rec.x, goombaFigure.rec.y, goombaFigure.rec.width, goombaFigure.rec.height);
+
+            g. drawImage(billPic, billFigure.xpos, billFigure.ypos, billFigure.width, billFigure.height, null);
         }
-        //draw the image of the astronaut
 
-        g.drawImage(marioPic, marioFigure.xpos, marioFigure.ypos, marioFigure.width, marioFigure.height, null);
-        // g.drawRect(marioFigure.rec.x, marioFigure.rec.y, marioFigure.rec.width,marioFigure.rec.height);
-
-        g.drawImage(goombaPic, goombaFigure.xpos, goombaFigure.ypos, goombaFigure.width, goombaFigure.height, null);
-        // g.drawRect(goombaFigure.rec.x, goombaFigure.rec.y, goombaFigure.rec.width, goombaFigure.rec.height);
-
+        else {
+            g.drawImage(gameoverPic,0,0, WIDTH, HEIGHT, null);
+        }
         g.dispose();
         bufferStrategy.show();
     }

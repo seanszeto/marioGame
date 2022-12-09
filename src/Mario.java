@@ -10,8 +10,11 @@ public class Mario {
     public int width;                 //the width of the hero image
     public int height;                //the height of the hero image
     public int lives;
+
     public boolean isAlive;           //a boolean to denote if the hero is alive or dead
     public boolean isCrashing = false;
+    public boolean isMinimizing = false;
+
     public Rectangle rec;
 
     public Mario (String pName, int pXpos, int pYpos){
@@ -38,7 +41,7 @@ public class Mario {
         xpos = xpos + dx;
         ypos = ypos + dy;
         // if mario hits the right side, reverse dx direction
-        if (xpos >= 1100 - width || xpos <= 0) {
+        if (xpos >= 1050 - width || xpos <= 0) {
             dx = -dx;
         }
         // if alien hits the top
