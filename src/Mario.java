@@ -37,6 +37,11 @@ public class Mario {
         ypos = ypos + dy;
     } // end move
 
+    public void stop(){
+        dx = 0;
+        dy = 0;
+    }
+
     public void bounce() {
         xpos = xpos + dx;
         ypos = ypos + dy;

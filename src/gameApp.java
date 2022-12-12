@@ -34,14 +34,11 @@ public class gameApp implements Runnable {
     public Image firemarioPic;
     public Image smallmarioPic;
     public Image gameoverPic;
-    public Image billPic;
-
     //Declare the objects used in the program
     //These are things that are made up of more than one variable type
     public Mario marioFigure;
     public Mario mushroomFigure;
     public Mario goombaFigure;
-    public Mario billFigure;
     public SoundFile thememusic;
     public SoundFile powerdown;
     public SoundFile powerup;
@@ -74,12 +71,6 @@ public class gameApp implements Runnable {
         goombaFigure.width = 40;
         goombaFigure.height = 40;
 
-        billPic = Toolkit.getDefaultToolkit().getImage("bulletbill.png");
-        billFigure = new Mario ("bill", 500, 600);
-        billFigure.dy = 0;
-        billFigure.width = 30;
-        billFigure.height = 30;
-
         smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
         // smallmarioFigure = new smallMario()
 
@@ -89,7 +80,7 @@ public class gameApp implements Runnable {
 
         backgroundPic = Toolkit.getDefaultToolkit().getImage("marioBackground.png");
 
-        thememusic = new SoundFile("runningabout.wav");
+        thememusic = new SoundFile("mariotheme.wav");
 
         powerup = new SoundFile("powerup.wav");
 
@@ -97,7 +88,7 @@ public class gameApp implements Runnable {
 
         die = new SoundFile("die.wav");
 
-        thememusic.play();
+        thememusic.loop();
     }
 
     public void run() {
@@ -117,7 +108,6 @@ public class gameApp implements Runnable {
         mushroomFigure.mushroomBounce();
         marioFigure.bounce();
         goombaFigure.bounce();
-        billFigure.wrap();
     }
 
     public void crash(){
@@ -125,7 +115,7 @@ public class gameApp implements Runnable {
 
             marioFigure.isCrashing = true;
             powerup.play();
-            // thememusic.pause();
+            thememusic.pause();
             if (marioFigure.lives == 1) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
             }
@@ -150,6 +140,9 @@ public class gameApp implements Runnable {
             marioFigure.isCrashing = false;
             // System.out.println("not touching mushroom");
         }
+        if (gameOver == false) {
+            thememusic.resume();
+        }
     }
     public void mimimizeMario(){
         if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
@@ -157,49 +150,43 @@ public class gameApp implements Runnable {
             // marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
             // marioFigure.width = 30;
             // marioFigure.height = 30;
-
+            thememusic.pause();
             powerdown.play();
-            // thememusic.pause();
 
             if (marioFigure.lives <= 3){
                 marioFigure.lives = marioFigure.lives - 1;
                 System.out.println(marioFigure.lives);
             }
-
             if (marioFigure.lives == 1) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
+//                marioFigure.lives = marioFigure.lives - 1;
                 marioFigure.width = 30;
                 marioFigure.height = 30;
+                thememusic.resume();
             }
             if (marioFigure.lives == 2) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
+//                marioFigure.lives = marioFigure.lives - 1;
+                thememusic.resume();
             }
-
-        }
-        if (billFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
-            marioFigure.isMinimizing = true;
-            marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
-            marioFigure.width = 30;
-            marioFigure.height = 30;
-            if (marioFigure.lives <= 2) {
-                marioFigure.lives = marioFigure.lives - 1;
-                System.out.println(marioFigure.lives);
+            if (marioFigure.lives == 0) {
+                gameOver = true;
+                thememusic.stop();
+                die.play();
+                marioFigure.stop();
+                goombaFigure.stop();
+                mushroomFigure.stop();
             }
         }
         if (!marioFigure.rec.intersects(goombaFigure.rec)) {
             marioFigure.isMinimizing = false;
-        }
-        if (marioFigure.lives == 0) {
-            gameOver = true;
-            die.play();
-            thememusic.stop();
         }
     }
 
 
 
     //Pauses or sleeps the computer for the amount specified in milliseconds
-    public void pause(int time ) {
+    public void pause(int time) {
         try {
             Thread.sleep(time);
         } catch (InterruptedException e) {
@@ -254,8 +241,6 @@ public class gameApp implements Runnable {
 
             g.drawImage(goombaPic, goombaFigure.xpos, goombaFigure.ypos, goombaFigure.width, goombaFigure.height, null);
             // g.drawRect(goombaFigure.rec.x, goombaFigure.rec.y, goombaFigure.rec.width, goombaFigure.rec.height);
-
-            g. drawImage(billPic, billFigure.xpos, billFigure.ypos, billFigure.width, billFigure.height, null);
         }
 
         else {
