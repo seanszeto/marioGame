@@ -1,15 +1,31 @@
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
 import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.tools.Tool;
+import java.awt.Canvas;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.image.BufferStrategy;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+/***
+ * Step 0 for keyboard control - Import
+ */
+import java.awt.event.*;
 
 
 //*******************************************************************************
 // Class Definition Section
 
-public class gameApp implements Runnable {
+public class gameApp implements Runnable, KeyListener {
 
     //Variable Definition Section
     //Declare the variables used in the program
@@ -53,6 +69,7 @@ public class gameApp implements Runnable {
 
     public gameApp() {
         setUpGraphics();
+        canvas.addKeyListener(this);
 
         marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
         marioFigure = new Mario("mario", 200, 300);
@@ -106,7 +123,7 @@ public class gameApp implements Runnable {
     public void moveThings() {
         //calls the move( ) code in the objects
         mushroomFigure.mushroomBounce();
-        marioFigure.bounce();
+        marioFigure.moveOnOwn();
         goombaFigure.bounce();
     }
 
@@ -192,6 +209,49 @@ public class gameApp implements Runnable {
         } catch (InterruptedException e) {
         }
     }
+    public void keyPressed(KeyEvent event) {
+        //This method will do something whenever any key is pressed down.
+        //Put if(  statements here
+        char key = event.getKeyChar();     //gets the character of the key pressed
+        int keyCode = event.getKeyCode();  //gets the keyCode (an integer) of the key pressed
+        System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
+
+        if (keyCode == 68) {
+            marioFigure.right = true;
+        }
+        if (keyCode == 83) {
+            marioFigure.down = true;
+        }
+        if (keyCode == 87) {
+            marioFigure.up = true;
+        }
+        if (keyCode == 65) {
+            marioFigure.left = true;
+        }
+    }//keyPressed()
+
+    public void keyReleased(KeyEvent event) {
+        char key = event.getKeyChar();
+        int keyCode = event.getKeyCode();
+        //This method will do something when a key is released
+        if (keyCode == 68) {
+            marioFigure.right = false;
+        }
+        if (keyCode == 83) {
+            marioFigure.down = false;
+        }
+        if (keyCode == 87) {
+            marioFigure.up = false;
+        }
+        if (keyCode == 65) {
+            marioFigure.left = false;
+        }
+
+    }//keyReleased()
+    public void keyTyped(KeyEvent event) {
+        // handles a press of a character key (any key that can be printed but not keys like SHIFT)
+        // we won't be using this method, but it still needs to be in your program
+    }//keyTyped()
 
     //Graphics setup method
     private void setUpGraphics() {

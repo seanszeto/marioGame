@@ -1,5 +1,6 @@
 import java.awt.*;
 
+
 public class Mario {
 
     public String name;               //name of the hero
@@ -14,6 +15,10 @@ public class Mario {
     public boolean isAlive;           //a boolean to denote if the hero is alive or dead
     public boolean isCrashing = false;
     public boolean isMinimizing = false;
+    public boolean right;
+    public boolean down;
+    public boolean left;
+    public boolean up;
 
     public Rectangle rec;
 
@@ -94,6 +99,40 @@ public class Mario {
 
         dx = -dx;
         dy = -dy;
+    }
+
+    public void moveOnOwn() {
+
+        if(right == true){
+            xpos = xpos +dx;
+            if(xpos>1000-width){
+                xpos = 1000-width;
+            }
+        }
+
+        if(down == true){
+            ypos = ypos +dy;
+            if(ypos>700-height){
+                ypos = 700-height;
+            }
+        }
+
+        if(left == true){
+            xpos = xpos - dx;
+            if(xpos < 0) {
+                xpos = 0;
+            }
+        }
+
+        if(up == true){
+            ypos = ypos - dy;
+            if(ypos<0);
+            ypos = 0;
+        }
+
+        //always put this after you've done all the changing of the xpos and ypos values
+        rec = new Rectangle(xpos, ypos, width, height);
+
     }
 }
 
