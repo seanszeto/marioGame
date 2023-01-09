@@ -105,15 +105,15 @@ public class Mario {
 
         if(right == true){
             xpos = xpos +dx;
-            if(xpos>1000-width){
-                xpos = 1000-width;
+            if(xpos>1100-width){
+                xpos = 1100-width;
             }
         }
 
         if(down == true){
-            ypos = ypos +dy;
-            if(ypos>700-height){
-                ypos = 700-height;
+            ypos = ypos - dy;
+            if(ypos>600-height){
+                ypos = 600-height;
             }
         }
 
@@ -125,9 +125,10 @@ public class Mario {
         }
 
         if(up == true){
-            ypos = ypos - dy;
-            if(ypos<0);
-            ypos = 0;
+            ypos = ypos + dy;
+            if(ypos<0) {
+                ypos = 0;
+            }
         }
 
         //always put this after you've done all the changing of the xpos and ypos values
