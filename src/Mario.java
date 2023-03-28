@@ -75,7 +75,7 @@ public class Mario {
     }
 
     public void wrap() {
-        xpos = xpos + dx;
+        xpos = xpos - dx;
         ypos = ypos + dy;
 
         if (xpos >= 1100 - width && dx > 0) {// left wall

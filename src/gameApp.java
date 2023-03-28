@@ -49,12 +49,14 @@ public class gameApp implements Runnable, KeyListener {
     public Image goombaPic;
     public Image firemarioPic;
     public Image smallmarioPic;
+    public Image billPic;
     public Image gameoverPic;
     //Declare the objects used in the program
     //These are things that are made up of more than one variable type
     public Mario marioFigure;
     public Mario mushroomFigure;
     public Mario goombaFigure;
+    public Mario billFigure;
     public SoundFile thememusic;
     public SoundFile powerdown;
     public SoundFile powerup;
@@ -74,6 +76,8 @@ public class gameApp implements Runnable, KeyListener {
         marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
         marioFigure = new Mario("mario", 200, 300);
         marioFigure.lives = 2;
+        marioFigure.dx = 4;
+        marioFigure.dy = -4;
 
 
         mushroomPic = Toolkit.getDefaultToolkit().getImage("mushroom8bit.png");
@@ -87,6 +91,12 @@ public class gameApp implements Runnable, KeyListener {
         goombaFigure.dy = 0;
         goombaFigure.width = 40;
         goombaFigure.height = 40;
+
+        billPic = Toolkit.getDefaultToolkit().getImage("bulletbill.png");
+        billFigure = new Mario ("bulletBill", 50, 700);
+        billFigure.dy = 0;
+        billFigure.width = 40;
+        billFigure.height = 40;
 
         smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
         // smallmarioFigure = new smallMario()
@@ -125,6 +135,7 @@ public class gameApp implements Runnable, KeyListener {
         mushroomFigure.mushroomBounce();
         marioFigure.moveOnOwn();
         goombaFigure.bounce();
+        billFigure.bounce();
     }
 
     public void crash(){
@@ -162,18 +173,24 @@ public class gameApp implements Runnable, KeyListener {
         }
     }
     public void mimimizeMario(){
-        if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
+
+        if (billFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
             marioFigure.isMinimizing = true;
-            // marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
-            // marioFigure.width = 30;
-            // marioFigure.height = 30;
             thememusic.pause();
             powerdown.play();
+            marioFigure.lives = marioFigure.lives - 1;
+        }
+        else if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
+            marioFigure.isMinimizing = true;
+            thememusic.pause();
+            powerdown.play();
+            marioFigure.lives = marioFigure.lives - 1;
+        }
 
-            if (marioFigure.lives <= 3){
-                marioFigure.lives = marioFigure.lives - 1;
-                System.out.println(marioFigure.lives);
-            }
+//            if (marioFigure.lives <= 3){
+//                marioFigure.lives = marioFigure.lives - 1;
+//                System.out.println(marioFigure.lives);
+//            }
             if (marioFigure.lives == 1) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
 //                marioFigure.lives = marioFigure.lives - 1;
@@ -193,9 +210,13 @@ public class gameApp implements Runnable, KeyListener {
                 marioFigure.stop();
                 goombaFigure.stop();
                 mushroomFigure.stop();
+                billFigure.stop();
             }
-        }
+
         if (!marioFigure.rec.intersects(goombaFigure.rec)) {
+            marioFigure.isMinimizing = false;
+        }
+        else if (!marioFigure.rec.intersects(billFigure.rec)) {
             marioFigure.isMinimizing = false;
         }
     }
@@ -216,16 +237,16 @@ public class gameApp implements Runnable, KeyListener {
         int keyCode = event.getKeyCode();  //gets the keyCode (an integer) of the key pressed
         System.out.println("Key Pressed: " + key + "  Code: " + keyCode);
 
-        if (keyCode == 68) {
+        if (keyCode == 39) {// right arrow
             marioFigure.right = true;
         }
         if (keyCode == 83) {
             marioFigure.down = true;
         }
-        if (keyCode == 87) {
+        if (keyCode == 32) {// space bar
             marioFigure.up = true;
         }
-        if (keyCode == 65) {
+        if (keyCode == 37) {// left arrow
             marioFigure.left = true;
         }
     }//keyPressed()
@@ -234,16 +255,16 @@ public class gameApp implements Runnable, KeyListener {
         char key = event.getKeyChar();
         int keyCode = event.getKeyCode();
         //This method will do something when a key is released
-        if (keyCode == 68) {
+        if (keyCode == 39) {
             marioFigure.right = false;
         }
         if (keyCode == 83) {
             marioFigure.down = false;
         }
-        if (keyCode == 87) {
+        if (keyCode == 32) {
             marioFigure.up = false;
         }
-        if (keyCode == 65) {
+        if (keyCode == 37) {
             marioFigure.left = false;
         }
 
@@ -301,6 +322,8 @@ public class gameApp implements Runnable, KeyListener {
 
             g.drawImage(goombaPic, goombaFigure.xpos, goombaFigure.ypos, goombaFigure.width, goombaFigure.height, null);
             // g.drawRect(goombaFigure.rec.x, goombaFigure.rec.y, goombaFigure.rec.width, goombaFigure.rec.height);
+
+            g.drawImage(billPic, billFigure.xpos, billFigure.ypos, billFigure.width, billFigure.height, null);
         }
 
         else {
