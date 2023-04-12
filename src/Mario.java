@@ -11,10 +11,12 @@ public class Mario {
     public int width;                 //the width of the hero image
     public int height;                //the height of the hero image
     public int lives;
+    public int jumps = 1;
 
     public boolean isAlive;           //a boolean to denote if the hero is alive or dead
     public boolean isCrashing = false;
     public boolean isMinimizing = false;
+    public boolean minimizing = false;
     public boolean right;
     public boolean down;
     public boolean left;
@@ -75,10 +77,15 @@ public class Mario {
     }
 
     public void wrap() {
-        xpos = xpos - dx;
+        xpos = xpos + dx;
         ypos = ypos + dy;
 
-        if (xpos >= 1100 - width && dx > 0) {// left wall
+
+
+//        if (xpos >= 1100 - width && dx > 0) {// left wall
+//            xpos = 0;
+//        }
+        if (xpos >= 1100) {
             xpos = 0;
         }
         if (xpos <= 1100 && dx < 0) {// right wall
@@ -103,33 +110,39 @@ public class Mario {
 
     public void moveOnOwn() {
 
+        xpos = xpos + dx;
+        ypos = ypos + dy;
+
         if(right == true){
-            xpos = xpos +dx;
-            if(xpos>1100-width){
-                xpos = 1100-width;
-            }
+            dx = 5;
+        }
+        else if (left == true){
+            dx = -5;
+        }
+        else {
+            dx = 0;
         }
 
-        if(down == true){
-            ypos = ypos - dy;
-            if(ypos>600-height){
-                ypos = 600-height;
-            }
+        dy = dy + 1;
+
+        if (ypos >= 480) {
+            ypos = 480;
+            jumps = 1;
         }
 
-        if(left == true){
-            xpos = xpos - dx;
-            if(xpos < 0) {
-                xpos = 0;
-            }
-        }
-
-        if(up == true){
-            ypos = ypos + dy;
-            if(ypos<0) {
-                ypos = 0;
-            }
-        }
+//        if(left == true){
+//            xpos = xpos - dx;
+//            if(xpos < 0) {
+//                xpos = 0;
+//            }
+//        }
+//
+//        if(up == true){
+//            ypos = ypos + dy;
+//            if(ypos<0) {
+//                ypos = 0;
+//            }
+//        }
 
         //always put this after you've done all the changing of the xpos and ypos values
         rec = new Rectangle(xpos, ypos, width, height);

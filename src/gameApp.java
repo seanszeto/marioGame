@@ -56,7 +56,7 @@ public class gameApp implements Runnable, KeyListener {
     public Mario marioFigure;
     public Mario mushroomFigure;
     public Mario goombaFigure;
-    public Mario billFigure;
+    public Bill billFigure;
     public SoundFile thememusic;
     public SoundFile powerdown;
     public SoundFile powerup;
@@ -74,14 +74,14 @@ public class gameApp implements Runnable, KeyListener {
         canvas.addKeyListener(this);
 
         marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
-        marioFigure = new Mario("mario", 200, 300);
+        marioFigure = new Mario("mario", 200, 450);
         marioFigure.lives = 2;
         marioFigure.dx = 4;
         marioFigure.dy = -4;
 
 
         mushroomPic = Toolkit.getDefaultToolkit().getImage("mushroom8bit.png");
-        mushroomFigure = new Mario("mushroom", 50, 480);
+        mushroomFigure = new Mario("mushroom", 600, 480);
         // mushroomFigure.dy = 0;
         mushroomFigure.width = 40;
         mushroomFigure.height = 40;
@@ -93,19 +93,18 @@ public class gameApp implements Runnable, KeyListener {
         goombaFigure.height = 40;
 
         billPic = Toolkit.getDefaultToolkit().getImage("bulletbill.png");
-        billFigure = new Mario ("bulletBill", 50, 700);
-        billFigure.dy = 0;
+        billFigure = new Bill ("bill", 500, 300);
         billFigure.width = 40;
         billFigure.height = 40;
+        billFigure.dx = -3;
 
         smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
-        // smallmarioFigure = new smallMario()
 
         firemarioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
 
         gameoverPic = Toolkit.getDefaultToolkit().getImage("gameover.png");
 
-        backgroundPic = Toolkit.getDefaultToolkit().getImage("marioBackground.png");
+        backgroundPic = Toolkit.getDefaultToolkit().getImage("mariobackgroundgif.gif");
 
         thememusic = new SoundFile("mariotheme.wav");
 
@@ -135,28 +134,24 @@ public class gameApp implements Runnable, KeyListener {
         mushroomFigure.mushroomBounce();
         marioFigure.moveOnOwn();
         goombaFigure.bounce();
-        billFigure.bounce();
+        billFigure.wrap();
     }
 
     public void crash(){
         if (mushroomFigure.rec.intersects(marioFigure.rec) && marioFigure.isCrashing == false){
 
             marioFigure.isCrashing = true;
-            powerup.play();
             thememusic.pause();
+            powerup.play();
+
             if (marioFigure.lives == 1) {
-                marioPic = Toolkit.getDefaultToolkit().getImage("mario8bit.png");
+                marioPic = Toolkit.getDefaultToolkit().getImage("mariobackgroundgif.gif");
+                marioFigure.width = 100;
+                marioFigure.height = 80;
             }
             if (marioFigure.lives == 2) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
             }
-            // marioFigure.width = marioFigure.width*2;
-            // marioFigure.height = marioFigure.height*2;
-            // marioPic = Toolkit.getDefaultToolkit().getImage("firemario8bit.png");
-            // mushroomFigure.bounce();
-            // mushroomFigure.changeDirection();
-            marioFigure.width = 100;
-            marioFigure.height = 80;
             if (marioFigure.lives < 3) {
                 marioFigure.lives = marioFigure.lives + 1;
                 System.out.println(marioFigure.lives);
@@ -174,28 +169,24 @@ public class gameApp implements Runnable, KeyListener {
     }
     public void mimimizeMario(){
 
-        if (billFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
+        if (billFigure.rec.intersects(marioFigure.rec) && !marioFigure.minimizing) {
+            marioFigure.minimizing = true;
+            thememusic.pause();
+            powerdown.play();
+            marioFigure.lives = marioFigure.lives - 1;
+            System.out.println(marioFigure);
+        }
+        else if (goombaFigure.rec.intersects(marioFigure.rec) && !marioFigure.isMinimizing) {
             marioFigure.isMinimizing = true;
             thememusic.pause();
             powerdown.play();
             marioFigure.lives = marioFigure.lives - 1;
         }
-        else if (goombaFigure.rec.intersects(marioFigure.rec) && marioFigure.isMinimizing == false) {
-            marioFigure.isMinimizing = true;
-            thememusic.pause();
-            powerdown.play();
-            marioFigure.lives = marioFigure.lives - 1;
-        }
-
-//            if (marioFigure.lives <= 3){
-//                marioFigure.lives = marioFigure.lives - 1;
-//                System.out.println(marioFigure.lives);
-//            }
             if (marioFigure.lives == 1) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
 //                marioFigure.lives = marioFigure.lives - 1;
-                marioFigure.width = 30;
-                marioFigure.height = 30;
+                marioFigure.width = 40;
+                marioFigure.height = 40;
                 thememusic.resume();
             }
             if (marioFigure.lives == 2) {
@@ -217,8 +208,8 @@ public class gameApp implements Runnable, KeyListener {
             marioFigure.isMinimizing = false;
         }
         else if (!marioFigure.rec.intersects(billFigure.rec)) {
-            marioFigure.isMinimizing = false;
-        }
+            marioFigure.minimizing = false;
+        } // (make another boolean (isMinimizing) for bill
     }
 
 
@@ -240,11 +231,13 @@ public class gameApp implements Runnable, KeyListener {
         if (keyCode == 39) {// right arrow
             marioFigure.right = true;
         }
-        if (keyCode == 83) {
+        if (keyCode == 83) {// s (move down)
             marioFigure.down = true;
         }
-        if (keyCode == 32) {// space bar
-            marioFigure.up = true;
+        if (keyCode == 32 && marioFigure.jumps < 3) {// space bar
+            marioFigure.dy = -15;
+            marioFigure.jumps++;
+            System.out.println("jump #: " + marioFigure.jumps);
         }
         if (keyCode == 37) {// left arrow
             marioFigure.left = true;
@@ -261,8 +254,9 @@ public class gameApp implements Runnable, KeyListener {
         if (keyCode == 83) {
             marioFigure.down = false;
         }
-        if (keyCode == 32) {
-            marioFigure.up = false;
+        if (keyCode == 32 && marioFigure.jumps < 2) {
+            marioFigure.dy = -20;
+            marioFigure.jumps++;
         }
         if (keyCode == 37) {
             marioFigure.left = false;
