@@ -2,24 +2,16 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.image.BufferStrategy;
-import java.awt.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.tools.Tool;
 import java.awt.Canvas;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
-import java.awt.image.BufferStrategy;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 /***
  * Step 0 for keyboard control - Import
  */
-import java.awt.event.*;
 
 
 //*******************************************************************************
@@ -57,6 +49,7 @@ public class gameApp implements Runnable, KeyListener {
     public Mario mushroomFigure;
     public Mario goombaFigure;
     public Bill billFigure;
+    public Bill[] bulletBill;
     public SoundFile thememusic;
     public SoundFile powerdown;
     public SoundFile powerup;
@@ -93,10 +86,15 @@ public class gameApp implements Runnable, KeyListener {
         goombaFigure.height = 40;
 
         billPic = Toolkit.getDefaultToolkit().getImage("bulletbill.png");
-        billFigure = new Bill ("bill", 500, 300);
+        billFigure = new Bill (500, 300, -3, 0, billPic);
         billFigure.width = 40;
         billFigure.height = 40;
         billFigure.dx = -3;
+        bulletBill = new Bill[5];
+        // construct bulletBill array
+        for (int x = 0; x < 5; x++) {
+            bulletBill[x] = new Bill((int) (Math.random() * 600 + 400), (int) (Math.random() * 500), -3, 0, billPic);
+        }
 
         smallmarioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
 
@@ -135,10 +133,16 @@ public class gameApp implements Runnable, KeyListener {
         marioFigure.moveOnOwn();
         goombaFigure.bounce();
         billFigure.wrap();
+        for (int x = 0; x < 5; x++) {
+            if(bulletBill[x] != null){
+                bulletBill[x].wrap();
+
+            }
+        }
     }
 
     public void crash(){
-        if (mushroomFigure.rec.intersects(marioFigure.rec) && marioFigure.isCrashing == false){
+        if (mushroomFigure.rec.intersects(marioFigure.rec) && !marioFigure.isCrashing){
 
             marioFigure.isCrashing = true;
             thememusic.pause();
@@ -163,16 +167,15 @@ public class gameApp implements Runnable, KeyListener {
             marioFigure.isCrashing = false;
             // System.out.println("not touching mushroom");
         }
-        if (gameOver == false) {
+        if (!gameOver) {
             thememusic.resume();
         }
     }
     public void mimimizeMario(){
 
-        if (billFigure.rec.intersects(marioFigure.rec) && !marioFigure.minimizing) {
-            marioFigure.minimizing = true;
+        if (billFigure.rec.intersects(marioFigure.rec) && !marioFigure.minimizingBill) {
+            marioFigure.minimizingBill = true;
             thememusic.pause();
-            powerdown.play();
             marioFigure.lives = marioFigure.lives - 1;
             System.out.println(marioFigure);
         }
@@ -182,6 +185,17 @@ public class gameApp implements Runnable, KeyListener {
             powerdown.play();
             marioFigure.lives = marioFigure.lives - 1;
         }
+
+        for (int x = 0; x < 5; x++) {
+            if(bulletBill[x] != null){
+                if (bulletBill[x].rec.intersects(marioFigure.rec) && !marioFigure.minimizingBill) {
+                    marioFigure.minimizingBill = true;
+                    thememusic.pause();
+                    marioFigure.lives = marioFigure.lives - 1;
+                }
+            }
+        }
+
             if (marioFigure.lives == 1) {
                 marioPic = Toolkit.getDefaultToolkit().getImage("smallmario8bit.png");
 //                marioFigure.lives = marioFigure.lives - 1;
@@ -207,8 +221,8 @@ public class gameApp implements Runnable, KeyListener {
         if (!marioFigure.rec.intersects(goombaFigure.rec)) {
             marioFigure.isMinimizing = false;
         }
-        else if (!marioFigure.rec.intersects(billFigure.rec)) {
-            marioFigure.minimizing = false;
+        if (!marioFigure.rec.intersects(billFigure.rec)) {
+            marioFigure.minimizingBill = false;
         } // (make another boolean (isMinimizing) for bill
     }
 
@@ -302,7 +316,7 @@ public class gameApp implements Runnable, KeyListener {
         Graphics2D g = (Graphics2D) bufferStrategy.getDrawGraphics();
         g.clearRect(0, 0, WIDTH, HEIGHT);
 
-        if (gameOver == false) {
+        if (!gameOver) {
             g.drawImage(backgroundPic, 0, 0, WIDTH, HEIGHT, null);
 
             // if mushroomFigure.isAlive(){
@@ -318,6 +332,13 @@ public class gameApp implements Runnable, KeyListener {
             // g.drawRect(goombaFigure.rec.x, goombaFigure.rec.y, goombaFigure.rec.width, goombaFigure.rec.height);
 
             g.drawImage(billPic, billFigure.xpos, billFigure.ypos, billFigure.width, billFigure.height, null);
+            g.drawRect(billFigure.rec.x, billFigure.rec.y, billFigure.rec.width, billFigure.rec.height);
+            for (int x = 0; x < 4; x++) {
+                if (bulletBill[x] != null && bulletBill[x].isAlive) {
+                    g.drawImage(bulletBill[x].pic, bulletBill[x].xpos, bulletBill[x].ypos, bulletBill[x].width, bulletBill[x].height, null);
+                    g.drawRect(bulletBill[x].rec.x, bulletBill[x].rec.y, bulletBill[x].rec.width, bulletBill[x].rec.height);
+                }
+            }
         }
 
         else {

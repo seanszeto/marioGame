@@ -1,30 +1,27 @@
 import java.awt.*;
 
 public class Bill {
-    public String name;               //name of the hero
     public int xpos;                  //the x position
     public int ypos;                  //the y position
     public int dx;                    //the speed of the hero in the x direction
     public int dy;                    //the speed of the hero in the y direction
     public int width;                 //the width of the hero image
     public int height;                //the height of the hero image
+    public boolean isAlive;
+    public Image pic;
     public Rectangle rec;
 
-    public Bill (String pName, int pXpos, int pYpos) {
-        name = pName;
+    public Bill (int pXpos, int pYpos, int dxParameter, int dyParameter, Image picParameter) {
         xpos = pXpos;
         ypos = pYpos;
-        dx = 0;
-        dy = 0;
-        width = 50;
-        height = 30;
+        width = 40;
+        height = 40;
+        dx = dxParameter;
+        dy = dyParameter;
+        isAlive = true;
+        pic = picParameter;
         rec = new Rectangle(xpos, ypos, width, height);
     }
-
-    public void move() { // move
-        xpos = xpos + dx;
-        ypos = ypos + dy;
-    } // end move
 
     public void stop(){
         dx = 0;
